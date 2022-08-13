@@ -3,11 +3,11 @@ import { useRouter } from 'next/router';
 import { PlusIcon, DotsVerticalIcon } from '@heroicons/react/solid';
 import { useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-import useLocalStorage from '../hooks/useLocalStorage';
+
 import { useEffect } from 'react';
 
 const BoardHeader = ({ boardName }) => (
-  <div className='flex justify-between w-full px-4 pt-4 pb-6 bg-neutral-800'>
+  <div className='flex justify-between w-full px-4 pt-4 pb-6 select-none bg-neutral-800'>
     <h1 className='text-3xl font-bold tracking-widest text-white'>{boardName}</h1>
     <div className='flex items-center gap-2'>
       <button className='inline-flex items-center gap-1 px-3 py-2 text-sm font-semibold transition-colors bg-purple-900 cursor-pointer rounded-2xl text-slate-300 hover:bg-purple-600 hover:text-slate-50'>
