@@ -1,3 +1,3 @@
 export default function Home() {
-  return <div></div>;
+  return <div className="flex-1 bg-neutral-900"></div>;
 }
