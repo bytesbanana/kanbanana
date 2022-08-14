@@ -3,6 +3,13 @@ import React from 'react';
 import { useState } from 'react';
 import { BoardAction, useBoardContext } from '../contexts/BoardContext';
 
+const buildNewCard = () => ({
+  id: 'card_' + Date.now(),
+  title: cardTitle,
+  total: 0,
+  done: 0,
+});
+
 const AddNewCardForm = ({ boardName, columnId }) => {
   const [showForm, setShowForm] = useState(false);
   const [cardTitle, setCardTitle] = useState('');
@@ -14,12 +21,7 @@ const AddNewCardForm = ({ boardName, columnId }) => {
       payload: {
         boardName,
         columnId,
-        card: {
-          id: 'card_' + Date.now(),
-          title: cardTitle,
-          total: 0,
-          done: 0,
-        },
+        card: buildNewCard(),
       },
     });
     resetForm();
@@ -29,7 +31,12 @@ const AddNewCardForm = ({ boardName, columnId }) => {
     switch (e.key) {
       case 'Enter':
         if (!cardTitle) break;
-
+        dispatch({
+          type: BoardAction.CARD_ADD,
+          boardName,
+          columnId,
+          card: buildNewCard()
+        });
         resetForm();
         break;
       case 'Escape':
