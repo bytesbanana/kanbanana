@@ -37,7 +37,7 @@ const SideNav = () => {
   };
 
   return (
-    <div className='w-[250px] bg-neutral-800 drop-shadow-2xl'>
+    <div className='w-[250px] min-w-[250px] bg-neutral-800 drop-shadow-2xl'>
       <div className='flex justify-center p-4 cursor-pointer'>
         <Link href='/'>
           <h1 className='flex items-center gap-2 text-3xl font-extrabold text-center text-transparent text-white lowercase shadow-2xl bg-gradient-to-r from-purple-500 to-yellow-500 bg-clip-text drop-shadow-2xl'>
