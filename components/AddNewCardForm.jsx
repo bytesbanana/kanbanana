@@ -3,9 +3,9 @@ import React from 'react';
 import { useState } from 'react';
 import { BoardAction, useBoardContext } from '../contexts/BoardContext';
 
-const buildNewCard = () => ({
+const buildNewCard = (title) => ({
   id: 'card_' + Date.now(),
-  title: cardTitle,
+  title,
   total: 0,
   done: 0,
 });
@@ -21,7 +21,7 @@ const AddNewCardForm = ({ boardName, columnId }) => {
       payload: {
         boardName,
         columnId,
-        card: buildNewCard(),
+        card: buildNewCard(cardTitle),
       },
     });
     resetForm();
@@ -35,7 +35,7 @@ const AddNewCardForm = ({ boardName, columnId }) => {
           type: BoardAction.CARD_ADD,
           boardName,
           columnId,
-          card: buildNewCard()
+          card: buildNewCard(title),
         });
         resetForm();
         break;
