@@ -3,9 +3,11 @@ import { useRouter } from 'next/router';
 import { PlusIcon, DotsVerticalIcon, XIcon } from '@heroicons/react/solid';
 import { useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-
 import { useEffect } from 'react';
 import { useRef } from 'react';
+
+import Column from './Column';
+import { BoardAction, useBoardContext } from '../contexts/BoardContext';
 
 const BoardHeader = ({ boardName }) => (
   <div className='flex justify-between px-4 pt-4 pb-6 select-none bg-neutral-800'>
@@ -16,84 +18,51 @@ const BoardHeader = ({ boardName }) => (
   </div>
 );
 
-const ColumnHeader = ({ colData }) => {
-  if (!colData) return <></>;
-  return (
-    <div className='flex items-center gap-2 p-1 text-sm font-medium text-slate-500'>
-      <div className={`rounded-full w-3 h-3`} style={{ backgroundColor: colData.color }} />
-      {colData.name} ({colData.cards.length})
-    </div>
-  );
-};
-
-const KANBANK_PREFIX = 'kanbanana_';
-
 const Board = () => {
   const router = useRouter();
   const { boardName } = router.query;
-  const [columns, setColumns] = useState([]);
+
   const [isAddNewColumn, setIsAddNewColumn] = useState(false);
   const [newColumnName, setNewColumnName] = useState('');
   const columnListRef = useRef();
-
-  useEffect(() => {
-    if (!router.isReady) return;
-    if (!localStorage) return;
-    const data = JSON.parse(localStorage.getItem(KANBANK_PREFIX + boardName));
-    if (data) {
-      setColumns(JSON.parse(localStorage.getItem(KANBANK_PREFIX + boardName)));
-    }
-  }, [router, boardName]);
-
-  useEffect(() => {
-    if (!localStorage) return;
-    if (!boardName) return;
-    localStorage.setItem(KANBANK_PREFIX + boardName, JSON.stringify(columns));
-  }, [columns, boardName]);
+  const { state: boardState, dispatch } = useBoardContext();
+  const board = boardState.boards?.find((b) => b.name === boardName);
+  const { columns } = board || [];
 
   const onDragEnd = (result) => {
     if (!result.destination) return;
 
-    const cols = JSON.parse(JSON.stringify(columns));
-    const { source, destination } = result;
-    const srcColIndex = -1;
-    const srcColData = cols.find((col, index) => {
-      if (col.id === source.droppableId) srcColIndex = index;
-      return col.id === source.droppableId;
+    dispatch({
+      type: BoardAction.CARD_MOVE,
+      payload: {
+        destination: result.destination,
+        source: result.source,
+        boardName,
+      },
     });
-    const srcCard = srcColData.cards.find((_, index) => index === source.index);
-    srcColData.cards.splice(source.index, 1);
-
-    const desColIndex = -1;
-    const desColData = cols.find((col, index) => {
-      if (col.id === destination.droppableId) desColIndex = index;
-      return col.id === destination.droppableId;
-    });
-
-    desColData.cards.splice(destination.index, 0, srcCard);
-    cols[srcColIndex] = srcColData;
-    cols[desColIndex] = desColData;
-
-    setColumns(cols);
   };
 
   const handleAddColumn = () => {
-    const lowerColName = newColumnName.toLowerCase();
-    const newColId = lowerColName.replace('/ /', '_');
+    const newColId = 'col_' + Date.now();
+
     if (!newColumnName) return;
-    const existCol = columns.find((col) => col.id === newColId);
+    const existCol = columns.find((col) => col.name === newColumnName);
     if (existCol) return;
 
-    setColumns([
-      ...columns,
-      {
-        id: newColId,
-        color: 'grey',
-        name: newColumnName,
-        cards: [],
+    dispatch({
+      type: BoardAction.COLUMN_ADD,
+      payload: {
+        boardName,
+        column: {
+          id: newColId,
+          color: 'grey',
+          name: newColumnName,
+          cards: [],
+        },
       },
-    ]);
+    });
     setNewColumnName('');
+    setIsAddNewColumn(false)
   };
 
   useEffect(() => {
@@ -110,41 +79,9 @@ const Board = () => {
       <BoardHeader boardName={boardName} />
       <DragDropContext onDragEnd={onDragEnd}>
         <div className='flex flex-1 overflow-scroll select-none' ref={columnListRef}>
-          {columns.map((col) => (
-            <div className='flex  flex-col min-w-[300px] max-w-[300px] p-4' key={col.name}>
-              <ColumnHeader colData={col} />
-              <Droppable droppableId={col.id}>
-                {(provided) => (
-                  <ul {...provided.droppableProps} ref={provided.innerRef} className='flex flex-col flex-1 gap-2'>
-                    {col.cards.map((card, index) => (
-                      <Draggable key={card.id} draggableId={card.id} index={index} id={card.id}>
-                        {(provided) => (
-                          <li
-                            key={card.id}
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className='p-4 rounded-md select-none bg-neutral-800'
-                          >
-                            <h2 className='text-lg font-semibold tracking-wide text-slate-300'>{card.title}</h2>
-                            {card.total === 0 && <p className='text-sm text-slate-500'>have no subtask</p>}
-                            {card.total > 0 && (
-                              <p className='text-sm text-slate-500'>
-                                {card.done} of {card.total} subtasks
-                              </p>
-                            )}
-                          </li>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </ul>
-                )}
-              </Droppable>
-            </div>
-          ))}
+          {columns && columns.map((col) => <Column boardName={boardName} data={col} key={col.id} />)}
 
-          <div className='min-w-[300px] max-w-[300px]px-4 pt-4 mx-4 mt-11 bg-neutral-800 rounded-t-md flex items-center justify-center'>
+          <div className='min-w-[300px] max-w-[300px] h-fit p-2 mx-4 mt-11 bg-neutral-800 rounded-md flex items-center justify-center'>
             {!isAddNewColumn && (
               <button
                 className='inline-flex items-center justify-center p-4 font-semibold transition text-slate-400 hover:scale-110'
@@ -154,6 +91,7 @@ const Board = () => {
                 New Column
               </button>
             )}
+
             {isAddNewColumn && (
               <form onSubmit={(e) => e.preventDefault()} className=''>
                 <input
@@ -166,7 +104,7 @@ const Board = () => {
                 <div className='flex items-center justify-start gap-2 py-2'>
                   <button
                     className='p-1 px-2 transition-colors bg-green-500 rounded-md text-slate-500 hover:bg-green-700 hover:text-green-200'
-                    onClick={handleAddColumn}
+                    onClick={() => handleAddColumn()}
                   >
                     Add column
                   </button>

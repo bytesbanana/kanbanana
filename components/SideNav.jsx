@@ -2,7 +2,7 @@ import React from 'react';
 import { useState } from 'react';
 import Link from 'next/link';
 import { ViewBoardsIcon, PlusCircleIcon, XIcon } from '@heroicons/react/solid';
-import useLocalStorage from '../hooks/useLocalStorage';
+import { BoardAction, useBoardContext } from '../contexts/BoardContext';
 
 const BoardListItem = ({ children }) => (
   <Link href={`/board/${children}`}>
@@ -14,25 +14,34 @@ const BoardListItem = ({ children }) => (
 );
 
 const SideNav = () => {
-  const [boards, setBoards] = useLocalStorage('board', []);
+  const { state, dispatch } = useBoardContext();
   const [addMode, toggleAddMode] = useState(false);
-  const [newBoard, setNewBoard] = useState('');
+  const [newBoardName, setNewBoardName] = useState('');
   const [isAddError, setIsAddError] = useState(false);
+  const { boards } = state || {};
 
   const handleInputKeyDown = (e) => {
-    if (e.key === 'Enter' && newBoard) {
+    if (e.key === 'Enter' && newBoardName) {
       setIsAddError(false);
-      if (boards.find((b) => b === newBoard)) {
+      if (boards?.find((b) => b.name === newBoardName)) {
         setIsAddError(true);
         return;
       }
-      setBoards([...boards, newBoard]);
-      setNewBoard('');
+
+      dispatch({
+        type: BoardAction.BOARD_ADD,
+        payload: {
+          id: Date.now(),
+          name: newBoardName,
+          columns: [],
+        },
+      });
+      setNewBoardName('');
     }
   };
 
   const handleBoardNameChange = (e) => {
-    setNewBoard(e.target.value);
+    setNewBoardName(e.target.value);
     setIsAddError(false);
   };
 
@@ -47,12 +56,10 @@ const SideNav = () => {
       </div>
       <div className='p-4'>
         <h2 className='text-xs font-semibold tracking-widest uppercase text-slate-300'>
-          all boards ({boards?.length})
+          all boards ({boards?.length || 0})
         </h2>
         <ul className='flex flex-col gap-2 p-1'>
-          {boards?.map((boardName, index) => (
-            <BoardListItem key={boardName + index}>{boardName}</BoardListItem>
-          ))}
+          {boards && boards?.map((board, index) => <BoardListItem key={board.id}>{board.name}</BoardListItem>)}
 
           {!addMode && (
             <li
@@ -63,24 +70,27 @@ const SideNav = () => {
             </li>
           )}
           {addMode && (
-            <form className='inline-flex items-center gap-1' onSubmit={(e) => e.preventDefault()}>
-              <input
-                className={`w-full px-4 py-1 leading-tight text-gray-700 bg-gray-200 border-2 border-gray-200 rounded appearance-none focus:outline-none focus:bg-white focus:border-purple-500`}
-                id='new-board-name'
-                type='text'
-                placeholder='New board name'
-                onChange={handleBoardNameChange}
-                onKeyDown={handleInputKeyDown}
-                autoComplete='off'
-                value={newBoard}
-              />
-              <XIcon
-                className='w-6 h-6 text-red-300 transition hover:scale-110'
-                onClick={() => {
-                  toggleAddMode(false);
-                  setNewBoard('');
-                }}
-              />
+            <form className='flex flex-col items-center gap-1' onSubmit={(e) => e.preventDefault()}>
+              <div className='inline-flex items-center'>
+                <input
+                  className={`w-full px-4 py-1 leading-tight text-gray-700 bg-gray-200 border-2 border-gray-200 rounded appearance-none focus:outline-none focus:bg-white focus:border-purple-500`}
+                  id='new-board-name'
+                  type='text'
+                  placeholder='New board name'
+                  onChange={handleBoardNameChange}
+                  onKeyDown={handleInputKeyDown}
+                  autoComplete='off'
+                  value={newBoardName}
+                />
+                <XIcon
+                  className='w-6 h-6 text-red-300 transition hover:scale-110'
+                  onClick={() => {
+                    toggleAddMode(false);
+                    setNewBoardName('');
+                  }}
+                />
+              </div>
+              <span className='w-full text-xs text-slate-500'>Press enter to create.</span>
             </form>
           )}
           {isAddError && <p className='font-semibold text-red-500'>Board name already exists</p>}
