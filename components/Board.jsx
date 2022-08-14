@@ -10,10 +10,6 @@ const BoardHeader = ({ boardName }) => (
   <div className='flex justify-between w-full px-4 pt-4 pb-6 select-none bg-neutral-800'>
     <h1 className='text-3xl font-bold tracking-widest text-white'>{boardName}</h1>
     <div className='flex items-center gap-2'>
-      <button className='inline-flex items-center gap-1 px-3 py-2 text-sm font-semibold transition-colors bg-purple-900 cursor-pointer rounded-2xl text-slate-300 hover:bg-purple-600 hover:text-slate-50'>
-        <PlusIcon className='w-4 h-4 text-white' />
-        Add new task
-      </button>
       <DotsVerticalIcon className='w-6 h-6 transition-colors cursor-pointer text-slate-200 hover:text-purple-600' />
     </div>
   </div>
@@ -39,6 +35,16 @@ const MOCK_DATA = [
     cards: [],
   },
 ];
+
+const ColumnHeader = ({ colData }) => {
+  if (!colData) return <></>;
+  return (
+    <div className='flex items-center gap-2 p-1 text-sm font-medium text-slate-500'>
+      <div className={`rounded-full w-3 h-3`} style={{ backgroundColor: colData.color }} />
+      {colData.name} ({colData.cards.length})
+    </div>
+  );
+};
 
 const KANBANK_PREFIX = 'kanbanana_';
 
@@ -93,15 +99,12 @@ const Board = () => {
 
   return (
     <div className='flex flex-col w-full bg-neutral-900'>
-      <BoardHeader boardName={boardName} />
+      <BoardHeader boardName={boardName}/>
       <DragDropContext onDragEnd={onDragEnd}>
         <div className='flex flex-1 select-none'>
           {columns.map((col) => (
             <div className='flex  flex-col w-[300px] p-4 ' key={col.name}>
-              <div className='flex items-center gap-2 p-1 text-sm font-medium text-slate-500'>
-                <div className={`rounded-full w-3 h-3`} style={{ backgroundColor: col.color }} />
-                {col.name} ({col.cards.length})
-              </div>
+              <ColumnHeader colData={col} />
               <Droppable droppableId={col.id}>
                 {(provided) => (
                   <ul {...provided.droppableProps} ref={provided.innerRef} className='flex flex-col flex-1 gap-2'>
