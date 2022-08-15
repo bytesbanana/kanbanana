@@ -1,9 +1,11 @@
 import dynamic from 'next/dynamic';
 import React from 'react';
 import { BoardContextProvider } from '../contexts/BoardContext';
+import Loader from './Loader';
 
 const DynamicSideNav = dynamic(() => import('../components/SideNav'), {
   ssr: false,
+  loading: () => <Loader />,
 });
 
 const Layout = (props) => {
