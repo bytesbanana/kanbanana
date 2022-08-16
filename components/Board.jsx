@@ -26,7 +26,7 @@ const Board = () => {
   const [newColumnName, setNewColumnName] = useState('');
   const columnListRef = useRef();
   const { state: boardState, dispatch } = useBoardContext();
-  const board = boardState.boards?.find((b) => b.name === boardName);
+  const board = boardState?.boards?.find((b) => b.name === boardName);
   const { columns } = board || [];
 
   const onDragEnd = (result) => {
@@ -62,7 +62,7 @@ const Board = () => {
       },
     });
     setNewColumnName('');
-    setIsAddNewColumn(false)
+    setIsAddNewColumn(false);
   };
 
   useEffect(() => {
