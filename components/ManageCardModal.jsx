@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { XIcon } from '@heroicons/react/solid';
 
-import useIsMouted from '../hooks/useIsMouted';
-
 const ManageCardModal = () => {
   const [isBrowse, setIsBrowse] = useState(false);
 
@@ -34,10 +32,7 @@ const ManageCardModal = () => {
               </button>
             </div>
             {/* Modal body */}
-            <div className='p-6 space-y-6'>
-            
-            Content goes here
-            </div>
+            <div className='p-6 space-y-6'>Content goes here</div>
             {/* Modal footer */}
             <div className='flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600'>
               <button
