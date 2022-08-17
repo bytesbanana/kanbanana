@@ -8,6 +8,8 @@ const buildNewCard = (title) => ({
   title,
   total: 0,
   done: 0,
+  description: '',
+  subtasks: [],
 });
 
 const AddNewCardForm = ({ boardName, columnId }) => {
@@ -15,15 +17,17 @@ const AddNewCardForm = ({ boardName, columnId }) => {
   const [cardTitle, setCardTitle] = useState('');
   const { state, dispatch } = useBoardContext();
 
+  const generateNewCardData = () => ({
+    type: BoardAction.CARD_ADD,
+    payload: {
+      boardName,
+      columnId,
+      card: buildNewCard(cardTitle),
+    },
+  });
+
   const handleAddNewCard = () => {
-    dispatch({
-      type: BoardAction.CARD_ADD,
-      payload: {
-        boardName,
-        columnId,
-        card: buildNewCard(cardTitle),
-      },
-    });
+    dispatch(generateNewCardData());
     resetForm();
   };
 
@@ -31,12 +35,7 @@ const AddNewCardForm = ({ boardName, columnId }) => {
     switch (e.key) {
       case 'Enter':
         if (!cardTitle) break;
-        dispatch({
-          type: BoardAction.CARD_ADD,
-          boardName,
-          columnId,
-          card: buildNewCard(title),
-        });
+        dispatch(generateNewCardData());
         resetForm();
         break;
       case 'Escape':
