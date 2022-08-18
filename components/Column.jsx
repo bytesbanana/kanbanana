@@ -22,6 +22,7 @@ CardList.displayName = 'CardList';
 
 const Column = ({ data, boardName }) => {
   const [showManageCard, setShowManageCard] = useState(false);
+  const [selectedCard, setSelectedCard] = useState();
 
   return (
     <>
@@ -39,7 +40,10 @@ const Column = ({ data, boardName }) => {
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
                       className='p-4 rounded-md select-none bg-neutral-800 hover:bg-neutral-700'
-                      onClick={() => setShowManageCard(true)}
+                      onClick={() => {
+                        setSelectedCard(card)
+                        setShowManageCard(true)
+                      }}
                     >
                       <h2 className='text-lg font-semibold tracking-wide text-slate-300'>{card.title}</h2>
                       {card.total === 0 && <p className='text-sm text-slate-500'>have no subtask</p>}
@@ -58,7 +62,7 @@ const Column = ({ data, boardName }) => {
             </CardList>
           )}
         </Droppable>
-        {!showManageCard && <ManageCardModal />}
+        {showManageCard && <ManageCardModal cardData={selectedCard} onCloseModal={() => setShowManageCard(false)}/>}
       </div>
     </>
   );
