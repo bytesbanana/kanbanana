@@ -1,16 +1,33 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { PlusIcon, XIcon } from '@heroicons/react/solid';
+import usePrevious from '../hooks/usePrevious';
 
-const SubTaskListItem = ({ data, onToggleCheck }) => {
+const SubTaskListItem = ({ data, onToggleCheck, onSaveTask, onDeleteTask }) => {
   const [editMode, setEditMode] = useState(true);
-  const [text, setText] = useState('');
+  const [text, setText] = useState(data.text);
+  const [inputText, setInputText] = useState(data.text);
+  const prevInputText = usePrevious(inputText);
 
   const handleSaveTask = () => {
+    onSaveTask({
+      ...data,
+      text,
+    });
+    setText(inputText);
     setEditMode(false);
   };
 
   const handleCancel = () => {
+    if (inputText.length > 0 && text.length == 0) {
+      onDeleteTask(data);
+    }
+    setInputText(text);
+    setEditMode(false);
+  };
+
+  const handleDelete = () => {
+    onDeleteTask(data);
     setEditMode(false);
   };
 
@@ -28,13 +45,12 @@ const SubTaskListItem = ({ data, onToggleCheck }) => {
             <textarea
               type='text'
               className='flex-auto h-auto p-2 rounded-sm'
-              onChange={(e) => setText(e.target.value)}
-              onBlur={() => setEditMode(false)}
-              value={text}
+              onChange={(e) => setInputText(e.target.value)}
+              value={inputText}
             />
           )}
           {!editMode && (
-            <p className='w-full h-6 cursor-pointer' onClick={() => setEditMode(true)}>
+            <p className='w-full h-6 text-green-200 cursor-pointer' onClick={() => setEditMode(true)}>
               {text}
             </p>
           )}
@@ -42,16 +58,19 @@ const SubTaskListItem = ({ data, onToggleCheck }) => {
         {editMode && (
           <div className='flex gap-2 px-9'>
             <button
-              className='px-2 py-1 text-sm font-semibold bg-green-600 rounded-md text-slate-50 hover:bg-green-700'
-              onClick={handleSaveTask}
+              className='px-2 py-1 text-sm font-semibold bg-green-600 rounded-md text-slate-50 hover:bg-green-700 disabled:bg-gray-500 disabled:cursor-not-allowed'
+              onClick={() => handleSaveTask()}
+              disabled={inputText === prevInputText || inputText.length === 0}
             >
               Save
             </button>
             <button
-              className='px-2 py-1 text-sm font-semibold rounded-md text-slate-200 hover:bg-slate-500'
-              onClick={handleCancel}
+              className={`px-2 py-1 text-sm font-semibold rounded-md ${
+                inputText.length === 0 ? 'text-slate-200 hover:bg-red-500' : 'text-slate-200 hover:bg-slate-500'
+              }`}
+              onClick={() => (inputText.length == 0 ? handleDelete() : handleCancel())}
             >
-              Cancel
+              {inputText.length === 0 || (inputText.length > 0 && text.length === 0) ? 'Delete' : 'Cancel'}
             </button>
           </div>
         )}
@@ -63,6 +82,7 @@ const SubTaskListItem = ({ data, onToggleCheck }) => {
 const ManageCardModal = ({ cardData, onCloseModal }) => {
   const [isBrowse, setIsBrowse] = useState(false);
   const [card, setCard] = useState(cardData);
+  const [inputDescription, setInputDescription] = useState('');
 
   useEffect(() => {
     setIsBrowse(true);
@@ -76,6 +96,7 @@ const ManageCardModal = ({ cardData, onCloseModal }) => {
     };
 
     setCard((prev) => {
+      prev.total += 1;
       return {
         ...prev,
         subtasks: [...prev.subtasks, subtask],
@@ -87,7 +108,35 @@ const ManageCardModal = ({ cardData, onCloseModal }) => {
     setCard((prevCard) => {
       const foundedTask = prevCard.subtasks.find((t) => t.id === task.id);
       foundedTask.done = !foundedTask.done;
+      prevCard.done = prevCard.done + (foundedTask.done ? 1 : -1);
+
       return { ...prevCard };
+    });
+  };
+
+  const handleSaveTask = (task) => {
+    setCard((prev) => {
+      const taskIndex = prev.subtasks.findIndex((t) => t.id === task.id);
+      prev.subtasks[taskIndex] = task;
+      return prev;
+    });
+  };
+
+  const handleDeleteTask = (task) => {
+    setCard((prev) => {
+      const taskIndex = prev.subtasks.findIndex((t) => t.id === task.id);
+      prev.subtasks.splice(taskIndex, 1);
+      prev.total -= 1;
+      return {
+        ...prev,
+      };
+    });
+  };
+
+  const handleSaveClick = () => {
+    console.log({
+      ...card,
+      description: inputDescription,
     });
   };
 
@@ -96,7 +145,13 @@ const ManageCardModal = ({ cardData, onCloseModal }) => {
       <>
         <ul className='flex flex-col w-full gap-2'>
           {card.subtasks.map((task) => (
-            <SubTaskListItem key={task.id} data={task} onToggleCheck={handleToggleCheck} />
+            <SubTaskListItem
+              key={task.id}
+              data={task}
+              onToggleCheck={handleToggleCheck}
+              onSaveTask={handleSaveTask}
+              onDeleteTask={handleDeleteTask}
+            />
           ))}
         </ul>
 
@@ -136,13 +191,19 @@ const ManageCardModal = ({ cardData, onCloseModal }) => {
             <div className='p-4'>
               <div className='flex flex-col gap-2'>
                 <h2 className='font-semibold tracking-wider text-md text-slate-100'>Description</h2>
-                <textarea name='description' className='w-full p-2 text-white rounded-sm bg-slate-500' rows={5} />
+                <textarea
+                  name='description'
+                  className='w-full p-2 text-white rounded-sm bg-slate-500'
+                  rows={5}
+                  onChange={(e) => setInputDescription(e.target.value)}
+                  value={inputDescription}
+                />
                 <div className='flex flex-col gap-2'>
                   <h2 className='font-semibold tracking-wider text-md text-slate-100'>Sub task</h2>
                   <div className='relative w-full h-2 rounded-md bg-slate-400'>
                     <div
                       className='relative h-2 transition-all duration-500 ease-in-out bg-green-400 rounded-md'
-                      style={{ width: `${card.done / Math.max(card.total, 1)}%` }}
+                      style={{ width: `${(card.done / (card.total === 0 ? 1 : card.total)) * 100}%` }}
                     />
                   </div>
                   {renderSubtask()}
@@ -155,6 +216,7 @@ const ManageCardModal = ({ cardData, onCloseModal }) => {
                 data-modal-toggle='defaultModal'
                 type='button'
                 className='text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
+                onClick={handleSaveClick}
               >
                 Save
               </button>
