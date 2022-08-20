@@ -76,7 +76,7 @@ const Board = () => {
 
   return (
     <div className='flex flex-col bg-neutral-900 max-w-[calc(100vw-250px)] w-full'>
-      <BoardHeader boardName={boardName} />
+      {/* <BoardHeader boardName={boardName} />
       <DragDropContext onDragEnd={onDragEnd}>
         <div className='flex flex-1 overflow-scroll select-none' ref={columnListRef}>
           {columns && columns.map((col) => <Column boardName={boardName} data={col} key={col.id} />)}
@@ -117,7 +117,7 @@ const Board = () => {
             )}
           </div>
         </div>
-      </DragDropContext>
+      </DragDropContext> */}
     </div>
   );
 };
