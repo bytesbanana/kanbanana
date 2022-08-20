@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 import { useRef } from 'react';
 
 import Column from './Column';
-import { BoardAction, useBoardContext } from '../contexts/BoardContext';
+import { AppAction, useAppContext } from '../contexts/BoardContext';
 
 const BoardHeader = ({ boardName }) => (
   <div className='flex justify-between px-4 pt-4 pb-6 select-none bg-neutral-800'>
@@ -25,61 +25,68 @@ const Board = () => {
   const [isAddNewColumn, setIsAddNewColumn] = useState(false);
   const [newColumnName, setNewColumnName] = useState('');
   const columnListRef = useRef();
-  const { state: boardState, dispatch } = useBoardContext();
-  const board = boardState?.boards?.find((b) => b.name === boardName);
-  const { columns } = board || [];
+  const { state, dispatch } = useAppContext();
+  const board = state?.boards?.find((b) => b.name === boardName);
+
+  const { columns } = state || [];
+
+  useEffect(() => {
+    if (!router.isReady) return;
+    if (board) return;
+
+    router.replace('/');
+  }, [router, board]);
 
   const onDragEnd = (result) => {
     if (!result.destination) return;
 
-    dispatch({
-      type: BoardAction.CARD_MOVE,
-      payload: {
-        destination: result.destination,
-        source: result.source,
-        boardName,
-      },
-    });
+    // dispatch({
+    //   type: AppAction.CARD_MOVE,
+    //   payload: {
+    //     destination: result.destination,
+    //     source: result.source,
+    //     boardName,
+    //   },
+    // });
   };
 
   const handleAddColumn = () => {
     const newColId = 'col_' + Date.now();
 
     if (!newColumnName) return;
-    const existCol = columns.find((col) => col.name === newColumnName);
+    const existCol = columns?.find((col) => col.name === newColumnName);
     if (existCol) return;
 
     dispatch({
-      type: BoardAction.COLUMN_ADD,
+      type: AppAction.COLUMN_ADD,
       payload: {
-        boardName,
-        column: {
-          id: newColId,
-          color: 'grey',
-          name: newColumnName,
-          cards: [],
-        },
+        id: newColId,
+        color: 'grey',
+        name: newColumnName,
+        boardId: board.id,
       },
     });
     setNewColumnName('');
     setIsAddNewColumn(false);
   };
 
-  useEffect(() => {
-    const childrenLength = columnListRef.current?.children?.length;
-    if (childrenLength <= 1) return;
+  // useEffect(() => {
+  //   const childrenLength = columnListRef.current?.children?.length;
+  //   if (childrenLength <= 1) return;
 
-    columnListRef.current?.children[childrenLength - 1].scrollIntoView({
-      behavior: 'smooth',
-    });
-  }, [columns]);
+  //   columnListRef.current?.children[childrenLength - 1].scrollIntoView({
+  //     behavior: 'smooth',
+  //   });
+  // }, [columns]);
 
   return (
     <div className='flex flex-col bg-neutral-900 max-w-[calc(100vw-250px)] w-full'>
-      {/* <BoardHeader boardName={boardName} />
+      <BoardHeader boardName={boardName} />
       <DragDropContext onDragEnd={onDragEnd}>
         <div className='flex flex-1 overflow-scroll select-none' ref={columnListRef}>
-          {columns && columns.map((col) => <Column boardName={boardName} data={col} key={col.id} />)}
+          {columns &&
+            columns.length > 0 &&
+            columns.map((col) => <Column boardName={boardName} columnId={col.id} key={col.id} />)}
 
           <div className='min-w-[300px] max-w-[300px] h-fit p-2 mx-4 mt-11 bg-neutral-800 rounded-md flex items-center justify-center'>
             {!isAddNewColumn && (
@@ -117,7 +124,7 @@ const Board = () => {
             )}
           </div>
         </div>
-      </DragDropContext> */}
+      </DragDropContext>
     </div>
   );
 };

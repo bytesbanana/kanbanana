@@ -2,9 +2,9 @@ import React from 'react';
 import { useState } from 'react';
 import Link from 'next/link';
 import { ViewBoardsIcon, PlusCircleIcon, XIcon } from '@heroicons/react/solid';
-import { BoardAction, useBoardContext } from '../contexts/BoardContext';
+import { AppAction, useAppContext } from '../contexts/BoardContext';
 
-const AddBoardForm = ({ boards, toggleAddMode }) => {
+const AddBoardForm = ({ boards, toggleAddMode, onAddBoard }) => {
   const [isAddError, setIsAddError] = useState(false);
   const [newBoardName, setNewBoardName] = useState('');
 
@@ -20,15 +20,10 @@ const AddBoardForm = ({ boards, toggleAddMode }) => {
         setIsAddError(true);
         return;
       }
-
-      // dispatch({
-      //   type: BoardAction.BOARD_ADD,
-      //   payload: {
-      //     id: Date.now(),
-      //     name: newBoardName,
-      //     columns: [],
-      //   },
-      // });
+      onAddBoard({
+        id: Date.now(),
+        name: newBoardName,
+      });
       setNewBoardName('');
     }
   };
@@ -80,17 +75,29 @@ const CreateNewBoardButton = ({ toggleAddMode }) => (
   </li>
 );
 
-const SideNavHeader = () => (
-  <h1 className='flex items-center gap-2 text-3xl font-extrabold text-center text-transparent text-white lowercase shadow-2xl bg-gradient-to-r from-purple-500 to-yellow-500 bg-clip-text drop-shadow-2xl'>
+const SideNavHeader = React.forwardRef((_, ref) => (
+  <h1
+    ref={ref}
+    className='flex items-center gap-2 text-3xl font-extrabold text-center text-transparent text-white lowercase shadow-2xl bg-gradient-to-r from-purple-500 to-yellow-500 bg-clip-text drop-shadow-2xl'
+  >
     Kanbanana
   </h1>
-);
+));
+
+SideNavHeader.displayName = 'SideNavHeader';
 
 const SideNav = () => {
-  const { state, dispatch } = useBoardContext();
+  const { state, dispatch } = useAppContext();
   const [addMode, toggleAddMode] = useState(false);
 
   const { boards } = state || {};
+
+  const handleOnAddBoard = (newBoard) => {
+    dispatch({
+      type: AppAction.BOARD_ADD,
+      payload: newBoard,
+    });
+  };
 
   return (
     <div className='w-[250px] min-w-[250px] bg-neutral-800 drop-shadow-2xl'>
@@ -104,9 +111,11 @@ const SideNav = () => {
           all boards ({boards?.length || 0})
         </h2>
         <ul className='flex flex-col gap-2 p-1'>
-          {boards && boards?.map((board, index) => <BoardListItem key={board.id}>{board.name}</BoardListItem>)}
+          {boards &&
+            boards.length > 0 &&
+            boards?.map((board, index) => <BoardListItem key={board.id}>{board.name}</BoardListItem>)}
           {!addMode && <CreateNewBoardButton toggleAddMode={toggleAddMode} />}
-          {addMode && <AddBoardForm boards={boards} toggleAddMode={toggleAddMode} />}
+          {addMode && <AddBoardForm boards={boards} toggleAddMode={toggleAddMode} onAddBoard={handleOnAddBoard} />}
         </ul>
       </div>
     </div>

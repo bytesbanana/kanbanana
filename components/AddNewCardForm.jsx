@@ -1,28 +1,23 @@
 import { PlusIcon } from '@heroicons/react/solid';
 import React from 'react';
 import { useState } from 'react';
-import { BoardAction, useBoardContext } from '../contexts/BoardContext';
-
-const buildNewCard = (title) => ({
-  id: 'card_' + Date.now(),
-  title,
-  total: 0,
-  done: 0,
-  description: '',
-  subtasks: [],
-});
+import { AppAction, useAppContext } from '../contexts/BoardContext';
 
 const AddNewCardForm = ({ boardName, columnId }) => {
   const [showForm, setShowForm] = useState(false);
   const [cardTitle, setCardTitle] = useState('');
-  const { state, dispatch } = useBoardContext();
+  const { state, dispatch } = useAppContext();
 
   const generateNewCardData = () => ({
-    type: BoardAction.CARD_ADD,
+    type: AppAction.CARD_ADD,
     payload: {
-      boardName,
+      id: 'card_' + Date.now(),
+      title: cardTitle,
+      total: 0,
+      done: 0,
+      description: '',
+      subtasks: [],
       columnId,
-      card: buildNewCard(cardTitle),
     },
   });
 
