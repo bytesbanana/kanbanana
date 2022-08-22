@@ -22,6 +22,7 @@ const AddNewCardForm = ({ boardName, columnId }) => {
   });
 
   const handleAddNewCard = () => {
+    if (!cardTitle) return;
     dispatch(generateNewCardData());
     resetForm();
   };
@@ -29,9 +30,7 @@ const AddNewCardForm = ({ boardName, columnId }) => {
   const handleKeyDown = (e) => {
     switch (e.key) {
       case 'Enter':
-        if (!cardTitle) break;
-        dispatch(generateNewCardData());
-        resetForm();
+        handleAddNewCard();
         break;
       case 'Escape':
         resetForm();
