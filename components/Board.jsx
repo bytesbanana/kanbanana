@@ -40,14 +40,13 @@ const Board = () => {
   const onDragEnd = (result) => {
     if (!result.destination) return;
 
-    // dispatch({
-    //   type: AppAction.CARD_MOVE,
-    //   payload: {
-    //     destination: result.destination,
-    //     source: result.source,
-    //     boardName,
-    //   },
-    // });
+    dispatch({
+      type: AppAction.CARD_MOVE,
+      payload: {
+        destination: result.destination,
+        source: result.source,
+      },
+    });
   };
 
   const handleAddColumn = () => {
