@@ -49,12 +49,10 @@ function appReducer(state, action) {
       newState = JSON.parse(JSON.stringify({ ...state }));
       newState.columns.push(payload);
       return newState;
-    // case BoardAction.CARD_ADD:
-    //   newState = JSON.parse(JSON.stringify({ ...state }));
-    //   board = newState.boards.find((b) => b.name === payload.boardName);
-    //   column = board.columns.find((c) => c.id === payload.columnId);
-    //   column.cards.push(payload.card);
-    //   return newState;
+    case AppAction.CARD_ADD:
+      newState = JSON.parse(JSON.stringify({ ...state }));
+      newState.cards.push(payload);
+      return newState;
 
     // case BoardAction.CARD_MOVE:
     //   const { boardName, source, destination } = payload;
