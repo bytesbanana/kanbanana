@@ -54,20 +54,34 @@ function appReducer(state, action) {
       newState.cards.push(payload);
       return newState;
 
-    // case BoardAction.CARD_MOVE:
-    //   const { boardName, source, destination } = payload;
-    //   newState = JSON.parse(JSON.stringify({ ...state }));
+    case AppAction.CARD_MOVE:
+      newState = JSON.parse(JSON.stringify({ ...state }));
+      let tempIndex = 0;
 
-    //   board = newState.boards.find((b) => b.name === boardName);
-    //   //POP Source Column
-    //   const srcColumn = board.columns.find((c) => c.id === source.droppableId);
-    //   const srcCard = srcColumn.cards[source.index];
-    //   srcColumn.cards.splice(source.index, 1);
+      const indexToSplice = newState.cards.findIndex((c) => {
+        const isColMatch = c.columnId === payload.source.droppableId;
+        const isIndexMatch = tempIndex === payload.source.index;
+        if (isColMatch) {
+          tempIndex += 1;
+        }
+        return isColMatch && isIndexMatch;
+      });
 
-    //   const desColumn = board.columns.find((c) => c.id === destination.droppableId);
-    //   desColumn.cards.splice(destination.index, 0, srcCard);
+      tempIndex = 0;
+      const indexToPlace = newState.cards.findIndex((c) => {
+        const isColMatch = c.columnId === payload.destination.droppableId;
+        const isIndexMatch = tempIndex === payload.destination.index;
+        if (isColMatch) {
+          tempIndex += 1;
+        }
+        return isColMatch && isIndexMatch;
+      });
 
-    //   return newState;
+      const cardToMove = newState.cards.splice(indexToSplice, 1)[0];
+
+      newState.cards.splice(Math.max(0, indexToPlace), 0, cardToMove);
+
+      return newState;
     default:
       return state;
   }
