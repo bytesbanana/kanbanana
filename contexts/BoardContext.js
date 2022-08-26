@@ -8,6 +8,8 @@ const initialState = {
   boards: [],
   columns: [],
   cards: [],
+  selectedCard: null,
+  showModal: false,
 };
 
 const AppContext = createContext({
@@ -21,6 +23,8 @@ const AppAction = {
   COLUMN_ADD: 'COLUMN_ADD',
   CARD_ADD: 'CARD_ADD',
   CARD_MOVE: 'CARD_MOVE',
+  MODAL_SHOW: 'MODAL_SHOW',
+  MODAL_HIDE: 'MODAL_HIDE',
 };
 
 function useAppContext() {
@@ -81,6 +85,18 @@ function appReducer(state, action) {
       newState.cards.splice(Math.max(0, indexToPlace), 0, cardToMove);
 
       return newState;
+    case AppAction.MODAL_SHOW:
+      return {
+        ...state,
+        selectedCard: payload,
+        showModal: true,
+      };
+    case AppAction.MODAL_HIDE:
+      return {
+        ...state,
+        selectedCard: null,
+        showModal: false,
+      };
     default:
       return state;
   }
