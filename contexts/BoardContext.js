@@ -29,8 +29,7 @@ function useAppContext() {
 
 function appReducer(state, action) {
   let newState;
-  let board;
-  let column;
+
   const { type, payload } = action;
 
   switch (type) {
