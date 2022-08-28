@@ -21,6 +21,7 @@ const AppAction = {
   COLUMN_ADD: 'COLUMN_ADD',
   CARD_ADD: 'CARD_ADD',
   CARD_MOVE: 'CARD_MOVE',
+  CARD_UPDATE: 'CARD_UPDATE',
 };
 
 function useAppContext() {
@@ -43,7 +44,6 @@ function appReducer(state, action) {
         ...state,
         boards: [...(state?.boards || []), payload],
       };
-      A;
     case AppAction.COLUMN_ADD:
       newState = JSON.parse(JSON.stringify({ ...state }));
       newState.columns.push(payload);
@@ -79,6 +79,14 @@ function appReducer(state, action) {
       const cardToMove = newState.cards.splice(indexToSplice, 1)[0];
 
       newState.cards.splice(Math.max(0, indexToPlace), 0, cardToMove);
+
+      return newState;
+    case AppAction.CARD_UPDATE:
+      newState = JSON.parse(JSON.stringify({ ...state }));
+      const cardIndex = newState.cards.findIndex((c) => c.id === payload.id);
+      newState.cards[cardIndex] = payload;
+
+      console.log(payload)
 
       return newState;
     default:
