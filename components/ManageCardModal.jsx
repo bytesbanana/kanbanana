@@ -4,7 +4,7 @@ import { PlusIcon, XIcon } from '@heroicons/react/solid';
 import usePrevious from '../hooks/usePrevious';
 
 const SubTaskListItem = ({ data, onToggleCheck, onSaveTask, onDeleteTask }) => {
-  const [editMode, setEditMode] = useState(true);
+  const [editMode, setEditMode] = useState(!data.text);
   const [text, setText] = useState(data.text);
   const [inputText, setInputText] = useState(data.text);
   const prevInputText = usePrevious(inputText);
@@ -12,7 +12,7 @@ const SubTaskListItem = ({ data, onToggleCheck, onSaveTask, onDeleteTask }) => {
   const handleSaveTask = () => {
     onSaveTask({
       ...data,
-      text,
+      text: inputText,
     });
     setText(inputText);
     setEditMode(false);
@@ -79,10 +79,10 @@ const SubTaskListItem = ({ data, onToggleCheck, onSaveTask, onDeleteTask }) => {
   );
 };
 
-const ManageCardModal = ({ cardData, onCloseModal }) => {
+const ManageCardModal = ({ cardData, onSave, onCloseModal }) => {
   const [isBrowse, setIsBrowse] = useState(false);
   const [card, setCard] = useState(cardData);
-  const [inputDescription, setInputDescription] = useState('');
+  const [inputDescription, setInputDescription] = useState(cardData.description);
 
   useEffect(() => {
     setIsBrowse(true);
@@ -134,7 +134,7 @@ const ManageCardModal = ({ cardData, onCloseModal }) => {
   };
 
   const handleSaveClick = () => {
-    console.log({
+    onSave({
       ...card,
       description: inputDescription,
     });
