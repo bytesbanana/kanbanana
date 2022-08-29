@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
-import { useAppContext } from '../contexts/BoardContext';
+import { AppAction, useAppContext } from '../contexts/BoardContext';
 import AddNewCardForm from './AddNewCardForm';
 import ManageCardModal from './ManageCardModal';
 
@@ -27,6 +27,14 @@ const Column = ({ columnId, boardName }) => {
   const { columns } = state;
   const columnData = state.columns.find((col) => col.id === columnId);
   const filteredCard = state.cards.filter((card) => card.columnId === columnId);
+
+  const handleSaveCard = (data) => {
+    dispatch({
+      type: AppAction.CARD_UPDATE,
+      payload: data,
+    });
+    setShowManageCard(false);
+  };
 
   return (
     <>
@@ -66,7 +74,13 @@ const Column = ({ columnId, boardName }) => {
             </CardList>
           )}
         </Droppable>
-        {/* {showManageCard && <ManageCardModal cardData={selectedCard} onCloseModal={() => setShowManageCard(false)}/>} */}
+        {showManageCard && (
+          <ManageCardModal
+            cardData={selectedCard}
+            onSave={handleSaveCard}
+            onCloseModal={() => setShowManageCard(false)}
+          />
+        )}
       </div>
     </>
   );
