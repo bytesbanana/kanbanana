@@ -1,3 +1,4 @@
+import { XIcon } from '@heroicons/react/solid';
 import React, { useMemo, useState } from 'react';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 import { AppAction, useAppContext } from '../contexts/BoardContext';
@@ -51,13 +52,14 @@ const Column = ({ columnId, boardName }) => {
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
-                      className='p-4 rounded-md select-none bg-neutral-800 hover:bg-neutral-700'
+                      className='relative p-4 rounded-md select-none bg-neutral-800 hover:bg-neutral-700'
                       onClick={() => {
                         setSelectedCard(card);
                         setShowManageCard(true);
                       }}
                     >
                       <h2 className='text-lg font-semibold tracking-wide text-slate-300'>{card.title}</h2>
+                      <XIcon className='absolute top-0 right-0 w-5 h-5 m-2 transition-colors text-slate-300 hover:text-white hover:scale-110' onClick={(e) => e.stopPropagation()} />
                       {card.total === 0 && <p className='text-sm text-slate-500'>have no subtask</p>}
                       {card.total > 0 && (
                         <p className='text-sm text-slate-500'>
