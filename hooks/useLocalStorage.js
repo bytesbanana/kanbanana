@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useState } from 'react';
 
 const useLocalStorage = (keyName, defaultValue) => {
@@ -21,7 +20,7 @@ const useLocalStorage = (keyName, defaultValue) => {
     try {
       window.localStorage.setItem(keyName, JSON.stringify(newValue));
     } catch (err) {
-      console.log(err)
+      console.log(err);
     }
     setStoredValue(newValue);
   };
