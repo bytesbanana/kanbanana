@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { PlusIcon, XIcon } from '@heroicons/react/solid';
 import usePrevious from '../hooks/usePrevious';
