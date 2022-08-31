@@ -4,6 +4,7 @@ import { Draggable, Droppable } from 'react-beautiful-dnd';
 import { AppAction, useAppContext } from '../contexts/BoardContext';
 import AddNewCardForm from './AddNewCardForm';
 import ManageCardModal from './ManageCardModal';
+import DeleteConfirmModal from './DeleteConfirmModal';
 
 const ColumnHeader = ({ columnName, columnSize, color }) => {
   return (
@@ -22,7 +23,8 @@ const CardList = React.forwardRef(({ children, ...rest }, ref) => (
 CardList.displayName = 'CardList';
 
 const Column = ({ columnId, boardName }) => {
-  const [showManageCard, setShowManageCard] = useState(false);
+  const [showManageCardModal, setShowManageCardModal] = useState(false);
+  const [showDeleteCardModal, setShowDeleteCardModal] = useState(false);
   const [selectedCard, setSelectedCard] = useState();
   const { state, dispatch } = useAppContext();
   const { columns } = state;
@@ -34,7 +36,20 @@ const Column = ({ columnId, boardName }) => {
       type: AppAction.CARD_UPDATE,
       payload: data,
     });
-    setShowManageCard(false);
+    setShowManageCardModal(false);
+  };
+
+  const handleDeleteCardClick = (card) => {
+    setSelectedCard(card);
+    setShowDeleteCardModal(true);
+  };
+
+  const handleCloseDeleteCardModal = () => {
+    setShowDeleteCardModal(false);
+  };
+
+  const handleDeleteCard = () => {
+    setShowDeleteCardModal(false);
   };
 
   return (
@@ -55,13 +70,16 @@ const Column = ({ columnId, boardName }) => {
                       className='relative p-4 rounded-md select-none bg-neutral-800 hover:bg-neutral-700'
                       onClick={() => {
                         setSelectedCard(card);
-                        setShowManageCard(true);
+                        setShowManageCardModal(true);
                       }}
                     >
                       <h2 className='text-lg font-semibold tracking-wide text-slate-300'>{card.title}</h2>
                       <XIcon
                         className='absolute top-0 right-0 w-5 h-5 m-2 transition-colors text-slate-300 hover:text-white hover:scale-110'
-                        onClick={(e) => e.stopPropagation()}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteCardClick(card);
+                        }}
                       />
                       {card.total === 0 && <p className='text-sm text-slate-500'>have no subtask</p>}
                       {card.total > 0 && (
@@ -79,11 +97,18 @@ const Column = ({ columnId, boardName }) => {
             </CardList>
           )}
         </Droppable>
-        {showManageCard && (
+        {showManageCardModal && (
           <ManageCardModal
             cardData={selectedCard}
             onSave={handleSaveCard}
-            onCloseModal={() => setShowManageCard(false)}
+            onCloseModal={() => setShowManageCardModal(false)}
+          />
+        )}
+        {showDeleteCardModal && (
+          <DeleteConfirmModal
+            title={selectedCard?.title}
+            onConfirm={handleDeleteCard}
+            onClose={handleCloseDeleteCardModal}
           />
         )}
       </div>
