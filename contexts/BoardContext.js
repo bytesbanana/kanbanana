@@ -85,9 +85,6 @@ function appReducer(state, action) {
       newState = JSON.parse(JSON.stringify({ ...state }));
       const cardIndex = newState.cards.findIndex((c) => c.id === payload.id);
       newState.cards[cardIndex] = payload;
-
-      console.log(payload)
-
       return newState;
     default:
       return state;
