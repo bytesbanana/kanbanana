@@ -22,6 +22,7 @@ const AppAction = {
   CARD_ADD: 'CARD_ADD',
   CARD_MOVE: 'CARD_MOVE',
   CARD_UPDATE: 'CARD_UPDATE',
+  CARD_DELETE: 'CARD_DELETE',
 };
 
 function useAppContext() {
@@ -30,6 +31,7 @@ function useAppContext() {
 
 function appReducer(state, action) {
   let newState;
+  let cardIndex;
 
   const { type, payload } = action;
 
@@ -83,8 +85,13 @@ function appReducer(state, action) {
       return newState;
     case AppAction.CARD_UPDATE:
       newState = JSON.parse(JSON.stringify({ ...state }));
-      const cardIndex = newState.cards.findIndex((c) => c.id === payload.id);
+      cardIndex = newState.cards.findIndex((c) => c.id === payload.id);
       newState.cards[cardIndex] = payload;
+      return newState;
+    case AppAction.CARD_DELETE:
+      newState = JSON.parse(JSON.stringify({ ...state }));
+      cardIndex = newState.cards.findIndex((c) => c.id === payload.id);
+      newState.cards.splice(cardIndex, 1);
       return newState;
     default:
       return state;
