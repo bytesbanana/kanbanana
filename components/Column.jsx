@@ -48,8 +48,14 @@ const Column = ({ columnId, boardName }) => {
     setShowDeleteCardModal(false);
   };
 
-  const handleDeleteCard = () => {
+  const handleDeleteCard = (id) => {
     setShowDeleteCardModal(false);
+    dispatch({
+      type: AppAction.CARD_DELETE,
+      payload: {
+        id,
+      },
+    });
   };
 
   return (
@@ -107,7 +113,7 @@ const Column = ({ columnId, boardName }) => {
         {showDeleteCardModal && (
           <DeleteConfirmModal
             title={selectedCard?.title}
-            onConfirm={handleDeleteCard}
+            onConfirm={() => handleDeleteCard(selectedCard.id)}
             onClose={handleCloseDeleteCardModal}
           />
         )}
