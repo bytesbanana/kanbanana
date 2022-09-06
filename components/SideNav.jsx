@@ -57,14 +57,23 @@ const AddBoardForm = ({ boards, toggleAddMode, onAddBoard }) => {
   );
 };
 
-const BoardListItem = ({ children }) => (
-  <Link href={`/board/${children}`}>
-    <li className='inline-flex gap-1 font-semibold text-white transition-colors cursor-pointer hover:text-purple-600'>
-      <ViewBoardsIcon className='w-6 h-6' />
-      {children}
-    </li>
-  </Link>
-);
+const BoardListItem = ({ children }) => {
+  const [showDeleteIcon, setShowDeleteIcon] = useState(false);
+
+  return (
+    <Link href={`/board/${children}`}>
+      <li
+        className='inline-flex gap-1 font-semibold text-white transition-colors cursor-pointer hover:text-purple-600'
+        onMouseEnter={() => setShowDeleteIcon(true)}
+        onMouseLeave={() => setShowDeleteIcon(false)}
+      >
+        <ViewBoardsIcon className='w-6 h-6' />
+        <div className='flex-1'>{children}</div>
+        <XIcon className='w-6 h-6 text-white transition-all hover:text-red-400' style={{ opacity: showDeleteIcon ? 1 : 0 }} />
+      </li>
+    </Link>
+  );
+};
 
 const CreateNewBoardButton = ({ toggleAddMode }) => (
   <li
