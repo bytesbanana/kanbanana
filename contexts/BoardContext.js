@@ -47,6 +47,25 @@ function appReducer(state, action) {
         ...state,
         boards: [...(state?.boards || []), payload],
       };
+    case AppAction.BOARD_DELETE:
+      const colToDelete = [];
+
+      const newColumns = state.columns.filter((col) => {
+        const isSameId = col.boardId === payload.boardId;
+        if (isSameId) {
+          colToDelete.push(col.id);
+        }
+        return isSameId;
+      });
+      const newCards = state.cards.filter((card) => {
+        return colToDelete.includes(card.columnId);
+      });
+
+      return {
+        ...state,
+        columns: newColumns,
+        cards: newCards,
+      };
     case AppAction.COLUMN_ADD:
       newState = JSON.parse(JSON.stringify({ ...state }));
       newState.columns.push(payload);
