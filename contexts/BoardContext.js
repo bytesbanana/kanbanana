@@ -18,6 +18,7 @@ const AppContext = createContext({
 const AppAction = {
   SAVE_DATA: 'SAVE_DATA',
   BOARD_ADD: 'BOARD_ADD',
+  BOARD_DELETE: 'BOARD_DELETE',
   COLUMN_ADD: 'COLUMN_ADD',
   CARD_ADD: 'CARD_ADD',
   CARD_MOVE: 'CARD_MOVE',
