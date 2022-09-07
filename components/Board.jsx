@@ -69,15 +69,6 @@ const Board = () => {
     setIsAddNewColumn(false);
   };
 
-  // useEffect(() => {
-  //   const childrenLength = columnListRef.current?.children?.length;
-  //   if (childrenLength <= 1) return;
-
-  //   columnListRef.current?.children[childrenLength - 1].scrollIntoView({
-  //     behavior: 'smooth',
-  //   });
-  // }, [columns]);
-
   return (
     <div className='flex flex-col bg-neutral-900 max-w-[calc(100vw-250px)] w-full'>
       <BoardHeader boardName={boardName} />
