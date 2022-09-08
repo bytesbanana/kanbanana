@@ -1,8 +1,9 @@
 import React from 'react';
 import { useState } from 'react';
 import Link from 'next/link';
-import { ViewBoardsIcon, PlusCircleIcon, XIcon } from '@heroicons/react/solid';
+import { PlusCircleIcon, XIcon } from '@heroicons/react/solid';
 import { AppAction, useAppContext } from '../contexts/BoardContext';
+import BoardListItem from './BoardListItem';
 
 const AddBoardForm = ({ boards, toggleAddMode, onAddBoard }) => {
   const [isAddError, setIsAddError] = useState(false);
@@ -57,24 +58,6 @@ const AddBoardForm = ({ boards, toggleAddMode, onAddBoard }) => {
   );
 };
 
-const BoardListItem = ({ children }) => {
-  const [showDeleteIcon, setShowDeleteIcon] = useState(false);
-
-  return (
-    <Link href={`/board/${children}`}>
-      <li
-        className='inline-flex gap-1 font-semibold text-white transition-colors cursor-pointer hover:text-purple-600'
-        onMouseEnter={() => setShowDeleteIcon(true)}
-        onMouseLeave={() => setShowDeleteIcon(false)}
-      >
-        <ViewBoardsIcon className='w-6 h-6' />
-        <div className='flex-1'>{children}</div>
-        <XIcon className='w-6 h-6 text-white transition-all hover:text-red-400' style={{ opacity: showDeleteIcon ? 1 : 0 }} />
-      </li>
-    </Link>
-  );
-};
-
 const CreateNewBoardButton = ({ toggleAddMode }) => (
   <li
     className='inline-flex gap-1 font-semibold text-purple-500 transition-colors cursor-pointer hover:text-white'
@@ -120,9 +103,7 @@ const SideNav = () => {
           all boards ({boards?.length || 0})
         </h2>
         <ul className='flex flex-col gap-2 p-1'>
-          {boards &&
-            boards.length > 0 &&
-            boards?.map((board, index) => <BoardListItem key={board.id}>{board.name}</BoardListItem>)}
+          {boards && boards.length > 0 && boards?.map((board, index) => <BoardListItem key={board.id} board={board} />)}
           {!addMode && <CreateNewBoardButton toggleAddMode={toggleAddMode} />}
           {addMode && <AddBoardForm boards={boards} toggleAddMode={toggleAddMode} onAddBoard={handleOnAddBoard} />}
         </ul>
