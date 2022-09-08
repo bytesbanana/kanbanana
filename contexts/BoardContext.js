@@ -51,18 +51,22 @@ function appReducer(state, action) {
       const colToDelete = [];
 
       const newColumns = state.columns.filter((col) => {
-        const isSameId = col.boardId === payload.boardId;
+        const isSameId = col.boardId !== payload.boardId;
         if (isSameId) {
           colToDelete.push(col.id);
         }
         return isSameId;
       });
+
       const newCards = state.cards.filter((card) => {
-        return colToDelete.includes(card.columnId);
+        return !colToDelete.includes(card.columnId);
       });
+
+      const newBoards = state.boards.filter((b) => b.id !== payload.boardId);
 
       return {
         ...state,
+        boards: newBoards,
         columns: newColumns,
         cards: newCards,
       };
