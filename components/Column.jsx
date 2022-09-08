@@ -112,7 +112,7 @@ const Column = ({ columnId, boardName }) => {
         )}
         {showDeleteCardModal && (
           <DeleteConfirmModal
-            title={selectedCard?.title}
+            title={`Are you want to delete card ${selectedCard?.title} ?`}
             onConfirm={() => handleDeleteCard(selectedCard.id)}
             onClose={handleCloseDeleteCardModal}
           />
