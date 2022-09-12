@@ -1,4 +1,4 @@
-import { XIcon } from '@heroicons/react/solid';
+import { TrashIcon, XIcon } from '@heroicons/react/solid';
 import React, { useState } from 'react';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 import { AppAction, useAppContext } from '../contexts/BoardContext';
@@ -8,9 +8,12 @@ import DeleteConfirmModal from './DeleteConfirmModal';
 
 const ColumnHeader = ({ columnName, columnSize, color }) => {
   return (
-    <div className='flex items-center gap-2 p-1 text-sm font-medium text-slate-500'>
-      <div className={`rounded-full w-3 h-3`} style={{ backgroundColor: color }} />
-      {columnName} ({columnSize})
+    <div className='flex items-center justify-between gap-2 p-1 text-sm font-medium text-slate-500'>
+      <div className='inline-flex items-center gap-1'>
+        <div className={`rounded-full w-3 h-3`} style={{ backgroundColor: color }} />
+        {columnName} ({columnSize})
+      </div>
+      <TrashIcon className='w-5 h-5 text-red-100 transition-colors hover:text-red-300' />
     </div>
   );
 };
