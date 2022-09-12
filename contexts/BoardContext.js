@@ -20,6 +20,7 @@ const AppAction = {
   BOARD_ADD: 'BOARD_ADD',
   BOARD_DELETE: 'BOARD_DELETE',
   COLUMN_ADD: 'COLUMN_ADD',
+  COLUMN_DELETE: 'COLUMN_DELETE',
   CARD_ADD: 'CARD_ADD',
   CARD_MOVE: 'CARD_MOVE',
   CARD_UPDATE: 'CARD_UPDATE',
@@ -74,6 +75,15 @@ function appReducer(state, action) {
       newState = JSON.parse(JSON.stringify({ ...state }));
       newState.columns.push(payload);
       return newState;
+    case AppAction.COLUMN_DELETE:
+      newCols = state.columns.filter((col) => col.id !== columnId);
+      newCards = state.cards.filter((card) => card.columnId !== payload.columnId);
+
+      return {
+        ...state,
+        columns: newColumns,
+        cards: newCards,
+      };
     case AppAction.CARD_ADD:
       newState = JSON.parse(JSON.stringify({ ...state }));
       newState.cards.push(payload);
