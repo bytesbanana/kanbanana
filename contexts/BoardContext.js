@@ -76,13 +76,10 @@ function appReducer(state, action) {
       newState.columns.push(payload);
       return newState;
     case AppAction.COLUMN_DELETE:
-      newCols = state.columns.filter((col) => col.id !== columnId);
-      newCards = state.cards.filter((card) => card.columnId !== payload.columnId);
-
       return {
         ...state,
-        columns: newColumns,
-        cards: newCards,
+        columns: newCstate.columns.filter((col) => col.id !== columnId),
+        cards: state.cards.filter((card) => card.columnId !== payload.columnId),
       };
     case AppAction.CARD_ADD:
       newState = JSON.parse(JSON.stringify({ ...state }));
