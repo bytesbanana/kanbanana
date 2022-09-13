@@ -78,7 +78,7 @@ function appReducer(state, action) {
     case AppAction.COLUMN_DELETE:
       return {
         ...state,
-        columns: newCstate.columns.filter((col) => col.id !== columnId),
+        columns: state.columns.filter((col) => col.id !== payload.columnId),
         cards: state.cards.filter((card) => card.columnId !== payload.columnId),
       };
     case AppAction.CARD_ADD:
