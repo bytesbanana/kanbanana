@@ -6,14 +6,14 @@ import AddNewCardForm from './AddNewCardForm';
 import ManageCardModal from './ManageCardModal';
 import DeleteConfirmModal from './DeleteConfirmModal';
 
-const ColumnHeader = ({ columnName, columnSize, color }) => {
+const ColumnHeader = ({ columnName, columnSize, color, onDeleteClick }) => {
   return (
     <div className='flex items-center justify-between gap-2 p-1 text-sm font-medium text-slate-500'>
       <div className='inline-flex items-center gap-1'>
         <div className={`rounded-full w-3 h-3`} style={{ backgroundColor: color }} />
         {columnName} ({columnSize})
       </div>
-      <TrashIcon className='w-5 h-5 text-red-100 transition-colors hover:text-red-300' />
+      <TrashIcon className='w-5 h-5 text-red-100 transition-colors hover:text-red-300' onClick={onDeleteClick} />
     </div>
   );
 };
@@ -28,6 +28,7 @@ CardList.displayName = 'CardList';
 const Column = ({ columnId, boardName }) => {
   const [showManageCardModal, setShowManageCardModal] = useState(false);
   const [showDeleteCardModal, setShowDeleteCardModal] = useState(false);
+  const [showDeleteColumnModal, setShowDeleteColumModal] = useState(false);
   const [selectedCard, setSelectedCard] = useState();
   const { state, dispatch } = useAppContext();
   const { columns } = state;
@@ -64,7 +65,12 @@ const Column = ({ columnId, boardName }) => {
   return (
     <>
       <div className='flex  flex-col min-w-[300px] max-w-[300px] p-4' key={columnData.name}>
-        <ColumnHeader columnName={columnData.name} columnSize={columns.length} color={columnData.color} />
+        <ColumnHeader
+          columnName={columnData.name}
+          columnSize={columns.length}
+          color={columnData.color}
+          onDeleteClick={() => setShowDeleteColumModal(true)}
+        />
         <Droppable droppableId={columnId}>
           {(provided) => (
             <CardList {...provided.droppableProps} ref={provided.innerRef} className='flex flex-col flex-1 gap-2'>
@@ -118,6 +124,20 @@ const Column = ({ columnId, boardName }) => {
             title={`Are you want to delete card ${selectedCard?.title} ?`}
             onConfirm={() => handleDeleteCard(selectedCard.id)}
             onClose={handleCloseDeleteCardModal}
+          />
+        )}
+        {showDeleteColumnModal && (
+          <DeleteConfirmModal
+            title={`Are you want to delete column ${columnData.name}?`}
+            onConfirm={() =>
+              dispatch({
+                type: AppAction.COLUMN_DELETE,
+                payload: {
+                  columnId,
+                },
+              })
+            }
+            onClose={() => setShowDeleteColumModal(false)}
           />
         )}
       </div>
